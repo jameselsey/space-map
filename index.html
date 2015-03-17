@@ -13,12 +13,18 @@
 <div id="container"></div>
 <script src="js/three.min.js"></script>
 <script src="js/controls/OrbitControls.js"></script>
+<script src="js/renderers/Projector.js"></script>
+<script src="js/renderers/CanvasRenderer.js"></script>
 <script>
 
     var camera, controls, scene, renderer, container;
 
+    var raycaster, mouse;
+
+    var stars = [];
+
     init();
-    render();
+    animate();
 
     function init() {
         // setup camera
@@ -36,6 +42,8 @@
         var geometry = new THREE.BoxGeometry(1, 1, 1);
         var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
         var sol = new THREE.Mesh(geometry, material);
+        scene.add(sol);
+        stars.push(sol);
 
         var altair = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({color: 0xFF3333}));
         altair.position.x = ( Math.random() - 0.5 ) * 10;
@@ -43,9 +51,14 @@
         altair.position.z = ( Math.random() - 0.5 ) * 10;
         altair.updateMatrix();
         altair.matrixAutoUpdate = false;
-
-        scene.add(sol);
         scene.add(altair);
+        stars.push(altair);
+
+        raycaster = new THREE.Raycaster();
+        mouse = new THREE.Vector2();
+
+        document.addEventListener('mousedown', onDocumentMouseDown, false);
+        document.addEventListener('touchstart', onDocumentTouchStart, false);
 
         // Renderer
         renderer = new THREE.WebGLRenderer();
@@ -53,9 +66,35 @@
 
         container = document.getElementById('container');
         container.appendChild(renderer.domElement);
-
-        animate();
     }
+
+    function onDocumentTouchStart(event) {
+        event.preventDefault();
+
+        event.clientX = event.touches[0].clientX;
+        event.clientY = event.touches[0].clientY;
+        onDocumentMouseDown(event);
+
+    }
+
+    function onDocumentMouseDown(event) {
+        event.preventDefault();
+
+        mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+        mouse.y = -( event.clientY / renderer.domElement.height ) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+
+        var intersects = raycaster.intersectObjects(stars);
+
+        if (intersects.length > 0) {
+            intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
+            console.log("Clicked something at " + intersects[0]);
+        }
+    }
+
+    var radius = 600;
+    var theta = 0;
 
     function render() {
         requestAnimationFrame(render);
@@ -64,6 +103,7 @@
 
     function animate() {
         requestAnimationFrame(animate);
+        render();
         controls.update();
     }
 
