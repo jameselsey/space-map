@@ -39,6 +39,23 @@
 
         controls.addEventListener('change', render);
         // Setup world
+        initStars();
+
+        raycaster = new THREE.Raycaster();
+        mouse = new THREE.Vector2();
+
+        document.addEventListener('mousedown', onDocumentMouseDown, false);
+        document.addEventListener('touchstart', onDocumentTouchStart, false);
+
+        // Renderer
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        container = document.getElementById('container');
+        container.appendChild(renderer.domElement);
+    }
+
+    function initStars(){
         var geometry = new THREE.SphereGeometry( 5);
         var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
         var sol = new THREE.Mesh(geometry, material);
@@ -53,19 +70,6 @@
         altair.matrixAutoUpdate = false;
         scene.add(altair);
         stars.push(altair);
-
-        raycaster = new THREE.Raycaster();
-        mouse = new THREE.Vector2();
-
-        document.addEventListener('mousedown', onDocumentMouseDown, false);
-        document.addEventListener('touchstart', onDocumentTouchStart, false);
-
-        // Renderer
-        renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-
-        container = document.getElementById('container');
-        container.appendChild(renderer.domElement);
     }
 
     function onDocumentTouchStart(event) {
