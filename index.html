@@ -40,6 +40,7 @@
         controls.addEventListener('change', render);
         // Setup world
         initStars();
+        buildAxes(500);
 
         raycaster = new THREE.Raycaster();
         mouse = new THREE.Vector2();
@@ -55,14 +56,14 @@
         container.appendChild(renderer.domElement);
     }
 
-    function initStars(){
-        var geometry = new THREE.SphereGeometry( 5);
+    function initStars() {
+        var geometry = new THREE.SphereGeometry(5);
         var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
         var sol = new THREE.Mesh(geometry, material);
         scene.add(sol);
         stars.push(sol);
 
-        var altair = new THREE.Mesh(new THREE.SphereGeometry( 5), new THREE.MeshBasicMaterial({color: 0xFF3333}));
+        var altair = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({color: 0xFF3333}));
         altair.position.x = ( Math.random() - 0.5 ) * 100;
         altair.position.y = ( Math.random() - 0.5 ) * 100;
         altair.position.z = ( Math.random() - 0.5 ) * 100;
@@ -109,6 +110,37 @@
         requestAnimationFrame(animate);
         render();
         controls.update();
+    }
+
+
+    function buildAxes(length) {
+        var axes = new THREE.Object3D();
+
+        axes.add(buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(length, 0, 0), 0xFF0000, false)); // +X
+        axes.add(buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(-length, 0, 0), 0xFF0000, true)); // -X
+        axes.add(buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, length, 0), 0x00FF00, false)); // +Y
+        axes.add(buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -length, 0), 0x00FF00, true)); // -Y
+        axes.add(buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, length), 0x0000FF, false)); // +Z
+        axes.add(buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -length), 0x0000FF, true)); // -Z
+
+        scene.add(axes);
+    }
+
+    function buildAxis(src, dst, colorHex, dashed) {
+        var geom = new THREE.Geometry(),
+                mat;
+
+        if (dashed) {
+            mat = new THREE.LineDashedMaterial({linewidth: 3, color: colorHex, dashSize: 3, gapSize: 3});
+        } else {
+            mat = new THREE.LineBasicMaterial({linewidth: 3, color: colorHex});
+        }
+
+        geom.vertices.push(src.clone());
+        geom.vertices.push(dst.clone());
+        geom.computeLineDistances(); // This one is SUPER important, otherwise dashed lines will appear as simple plain lines
+
+        return new THREE.Line(geom, mat, THREE.LinePieces);
     }
 
 </script>
