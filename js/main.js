@@ -15,10 +15,8 @@ function init() {
     // Scene
     scene = new THREE.Scene();
     // Controls
-    controls = new THREE.OrbitControls(camera);
-    controls.damping = 0.2;
+    initControls();
 
-    controls.addEventListener('change', render);
     // Setup world
     initStars();
     buildAxes(500);
@@ -36,7 +34,23 @@ function init() {
     container = document.getElementById('container');
     container.appendChild(renderer.domElement);
 }
+function initControls(){
+    controls = new THREE.TrackballControls( camera );
 
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+
+    controls.noZoom = false;
+    controls.noPan = false;
+
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3;
+
+    controls.keys = [ 65, 83, 68 ];
+
+    controls.addEventListener( 'change', render );
+}
 function initStars() {
     var geometry = new THREE.SphereGeometry(5);
     var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
