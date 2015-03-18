@@ -3,6 +3,12 @@ var camera, controls, scene, renderer, container;
 var raycaster, mouse;
 
 var stars = [];
+var gui;
+
+var GuiControls = function() {
+    this.home = function() { console.log('clicked home!'); controls.reset(); };
+    // Define render logic ...
+};
 
 init();
 animate();
@@ -11,6 +17,7 @@ function init() {
     // setup camera
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 150;
+    buildGUI();
 
     // Scene
     scene = new THREE.Scene();
@@ -34,6 +41,14 @@ function init() {
     container = document.getElementById('container');
     container.appendChild(renderer.domElement);
 }
+
+
+function buildGUI(){
+    var guiControls = new GuiControls();
+    var gui = new dat.GUI();
+    gui.add(guiControls, 'home');
+}
+
 function initControls(){
     controls = new THREE.TrackballControls( camera );
 
